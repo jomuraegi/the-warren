@@ -42,6 +42,18 @@
     }
 
     /* =========================================
+       [NEW] 서서히 나타나는 등장 애니메이션
+       ========================================= */
+    @keyframes mainSlideUp {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes uiFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* =========================================
        [NEW] 상단 네비게이션 메뉴 바
        ========================================= */
     #top-nav {
@@ -52,6 +64,7 @@
       justify-content: space-between; align-items: center;
       padding: 15px 40px; box-sizing: border-box; z-index: 10000;
       box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+      animation: uiFadeIn 1.5s ease-out forwards; /* 부드럽게 등장 */
     }
     .nav-logo { font-weight: bold; color: #00ffcc; font-size: 1.2em; letter-spacing: 2px; }
     .nav-links a {
@@ -106,10 +119,11 @@
        ========================================= */
     .status-panel { border: 1px solid #333; padding: 15px; margin-bottom: 20px; }
     #fixed-status {
-      position: fixed; top: 80px; /* 네비바에 가려지지 않게 20px에서 80px로 수정! */ 
+      position: fixed; top: 80px;
       right: 20px;
       background-color: rgba(7, 7, 9, 0.85); backdrop-filter: blur(10px);
       width: 250px; z-index: 9999; display: none; box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+      animation: uiFadeIn 1.5s ease-out forwards; /* 부드럽게 등장 */
     }
     .info-header { border-bottom: 1px dashed currentcolor; padding-bottom: 8px; margin-bottom: 10px; font-weight: bold; }
     .status-item { margin: 8px 0; display: flex; justify-content: space-between; font-size: 0.9em; }
@@ -122,6 +136,7 @@
     #main-content {
       display: none; max-width: 900px; margin: 150px auto 100px auto; padding: 20px;
       position: relative; z-index: 10;
+      animation: mainSlideUp 1.2s ease-out forwards; /* 메인 콘텐츠 스윽 올라오기! */
     }
     
     #main-content::before {
@@ -472,7 +487,7 @@
       }
     }
 
-    // [NEW] 상단 네비게이션 클릭 시 해당 섹션으로 부드럽게 이동하고 창 열기
+    // 상단 네비게이션 클릭 시 해당 섹션으로 부드럽게 이동하고 창 열기
     function goToNode(nodeId) {
       const node = document.getElementById(nodeId);
       if (!node.classList.contains('active')) {
@@ -489,7 +504,7 @@
       const mainContent = document.getElementById('main-content');
       const fixedStatus = document.getElementById('fixed-status');
       const bgLayer = document.getElementById('bg-layer');
-      const topNav = document.getElementById('top-nav'); // 네비게이션 바 추가
+      const topNav = document.getElementById('top-nav');
 
       introScreen.classList.add('glitch-active');
 
@@ -497,7 +512,7 @@
         introScreen.style.display = 'none';
         mainContent.style.display = 'block';
         fixedStatus.style.display = 'block';
-        topNav.style.display = 'flex'; // 메인 접속 시 네비게이션 바 나타남
+        topNav.style.display = 'flex';
         bgLayer.classList.add('main-active'); 
       }, 4500); 
     }
