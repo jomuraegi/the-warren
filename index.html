@@ -42,7 +42,7 @@
     }
 
     /* =========================================
-       [NEW] 서서히 나타나는 등장 애니메이션
+       서서히 나타나는 등장 애니메이션
        ========================================= */
     @keyframes mainSlideUp {
       from { opacity: 0; transform: translateY(50px); }
@@ -54,17 +54,17 @@
     }
 
     /* =========================================
-       [NEW] 상단 네비게이션 메뉴 바
+       상단 네비게이션 메뉴 바
        ========================================= */
     #top-nav {
       position: fixed; top: 0; left: 0; width: 100%;
       background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
       border-bottom: 1px solid #00ffcc;
-      display: none; /* 처음 대기 화면에서는 숨김 */
+      display: none; 
       justify-content: space-between; align-items: center;
       padding: 15px 40px; box-sizing: border-box; z-index: 10000;
       box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
-      animation: uiFadeIn 1.5s ease-out forwards; /* 부드럽게 등장 */
+      animation: uiFadeIn 1.5s ease-out forwards;
     }
     .nav-logo { font-weight: bold; color: #00ffcc; font-size: 1.2em; letter-spacing: 2px; }
     .nav-links a {
@@ -123,7 +123,7 @@
       right: 20px;
       background-color: rgba(7, 7, 9, 0.85); backdrop-filter: blur(10px);
       width: 250px; z-index: 9999; display: none; box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
-      animation: uiFadeIn 1.5s ease-out forwards; /* 부드럽게 등장 */
+      animation: uiFadeIn 1.5s ease-out forwards;
     }
     .info-header { border-bottom: 1px dashed currentcolor; padding-bottom: 8px; margin-bottom: 10px; font-weight: bold; }
     .status-item { margin: 8px 0; display: flex; justify-content: space-between; font-size: 0.9em; }
@@ -136,7 +136,7 @@
     #main-content {
       display: none; max-width: 900px; margin: 150px auto 100px auto; padding: 20px;
       position: relative; z-index: 10;
-      animation: mainSlideUp 1.2s ease-out forwards; /* 메인 콘텐츠 스윽 올라오기! */
+      animation: mainSlideUp 1.2s ease-out forwards;
     }
     
     #main-content::before {
@@ -181,6 +181,22 @@
     .drone-node.active .node-content { display: block; }
     .drone-node.active .drone-icon { background: rgba(255,255,255,0.1); }
 
+    /* 구역별 배경/전경 이미지 자리 */
+    .zone-img {
+      width: 100%; height: 180px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px dashed currentcolor;
+      margin: 15px 0;
+      display: flex; align-items: center; justify-content: center;
+      color: #777; font-size: 0.85em; letter-spacing: 2px;
+      overflow: hidden;
+    }
+    .zone-img img {
+      width: 100%; height: 100%; object-fit: cover;
+      opacity: 0.7; transition: opacity 0.3s;
+    }
+    .zone-img:hover img { opacity: 1; }
+
     /* 노드 고유 색상 */
     #node-intro { color: #00ffcc; }
     #node-intro .drone-icon, #node-intro .node-content { border-color: #00ffcc; color: #00ffcc; }
@@ -203,55 +219,25 @@
        4. 인물 기록망 캐릭터 카드 (Grid)
        ========================================= */
     .character-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 15px; margin-top: 20px;
     }
     .char-card {
-      border: 1px solid #333;
-      background: rgba(0,0,0,0.6);
-      padding: 10px;
-      text-align: center;
-      transition: all 0.3s ease;
-      cursor: pointer;
+      border: 1px solid #333; background: rgba(0,0,0,0.6); padding: 10px; text-align: center;
+      transition: all 0.3s ease; cursor: pointer;
     }
     .char-card:hover {
-      background: rgba(0, 255, 204, 0.1);
-      border-color: #00ffcc;
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0,255,204,0.2);
+      background: rgba(0, 255, 204, 0.1); border-color: #00ffcc;
+      transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,255,204,0.2);
     }
-    
-    /* 이미지 들어갈 자리 */
     .char-img {
-      width: 100%;
-      height: 140px;
-      background: #111;
-      border: 1px dashed #444;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #555;
-      font-size: 0.8em;
-      letter-spacing: 1px;
+      width: 100%; height: 140px; background: #111; border: 1px dashed #444;
+      margin-bottom: 10px; display: flex; align-items: center; justify-content: center;
+      color: #555; font-size: 0.8em; letter-spacing: 1px;
     }
-    /* 실제 이미지가 적용될 때 사용하는 클래스 */
     .char-img img { width: 100%; height: 100%; object-fit: cover; }
-
-    .char-name {
-      color: #00ffcc;
-      font-weight: bold;
-      font-size: 1.05em;
-      margin-bottom: 5px;
-    }
-    .char-role {
-      color: #ccc;
-      font-size: 0.75em;
-      line-height: 1.4;
-      word-break: keep-all;
-    }
+    .char-name { color: #00ffcc; font-weight: bold; font-size: 1.05em; margin-bottom: 5px; }
+    .char-role { color: #ccc; font-size: 0.75em; line-height: 1.4; word-break: keep-all; }
     
     /* 구역별 카드 상단 컬러 띠 */
     .veilcore-border { border-top: 3px solid #ffffff; }
@@ -262,7 +248,7 @@
 </head>
 <body>
 
-  <!-- [NEW] 상단 네비게이션 메뉴 바 -->
+  <!-- 상단 네비게이션 메뉴 바 -->
   <nav id="top-nav">
     <div class="nav-logo">THE WARREN</div>
     <div class="nav-links">
@@ -315,7 +301,7 @@
           <circle cx="12" cy="12" r="4"/> <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/> <rect x="3" y="3" width="3" height="3"/> <rect x="18" y="3" width="3" height="3"/> <rect x="3" y="18" width="3" height="3"/> <rect x="18" y="18" width="3" height="3"/>
         </svg>
       </div>
-    <div class="node-content">
+      <div class="node-content">
         <h2>>> SYSTEM LOG_IN : <span id="display-name">이방인</span></h2>
         
         <p style="color: #ccc; font-style: italic; margin-bottom: 20px;">
@@ -351,8 +337,12 @@
         </svg>
       </div>
       <div class="node-content">
-        <h2>[ LAYER 1 : 베일코어 Veilcore ]</h2>
-        <p><strong>접속 조건:</strong> 1급 시그눔 인증 및 막대한 자본력 증명</p>
+        <h2>[ 상층부 : 베일코어 Veilcore ]</h2>
+        <!-- 구역 배경 이미지 영역 -->
+        <div class="zone-img">
+          <img src="베일코어_이미지.png" alt="베일코어 배경">
+        </div>
+        <p><strong>생존 조건:</strong> 1급 시그눔 인증 및 막대한 자본력 증명</p>
       </div>
     </div>
 
@@ -365,8 +355,12 @@
         </svg>
       </div>
       <div class="node-content">
-        <h2>[ LAYER 2 : 미드링 Mid-ring 회색지대 ]</h2>
-        <p><strong>접속 조건:</strong> 임시 시그눔 또는 구역 통행권 소지</p>
+        <h2>[ 중층부 : 미드링 Mid-ring 회색지대 ]</h2>
+        <!-- 구역 배경 이미지 영역 -->
+        <div class="zone-img">
+          <img src="미드링_이미지.png" alt="미드링 배경">
+        </div>
+        <p><strong>생존 조건:</strong> 임시 시그눔 또는 구역 통행권 소지</p>
       </div>
     </div>
 
@@ -379,8 +373,12 @@
         </svg>
       </div>
       <div class="node-content">
-        <h2>[ LAYER 3 : 언더시티 Undercity 크롬지대 ]</h2>
-        <p><strong>접속 조건:</strong> 생존 본능, 묻지 않을 침묵</p>
+        <h2>[ 하층부 : 언더시티 Undercity 크롬지대 ]</h2>
+        <!-- 구역 배경 이미지 영역 -->
+        <div class="zone-img">
+          <img src="언더시티_이미지.png" alt="언더시티 배경">
+        </div>
+        <p><strong>생존 조건:</strong> 생존 본능, 묻지 않을 침묵</p>
       </div>
     </div>
 
