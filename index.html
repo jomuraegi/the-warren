@@ -7,62 +7,39 @@
   <style>
     /* 기본 설정 */
     body {
-      background-color: #000;
-      color: #00ffcc;
+      background-color: #000; color: #00ffcc;
       font-family: 'Courier New', Courier, monospace;
-      margin: 0;
-      padding: 0;
-      line-height: 1.6;
+      margin: 0; padding: 0; line-height: 1.6;
       overflow-x: hidden;
     }
 
     ::selection { background: #ff3366; color: #fff; }
 
     /* =========================================
-       0. 배경 이미지 레이어 (고정 & 패럴랙스 스크롤)
+       0. 배경 이미지 및 조명 레이어 (패럴랙스)
        ========================================= */
     #bg-layer {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100vh;
-      /* 👇 여기에 조무래기가 깃허브에 올린 배경 이미지 파일명을 적어라냥! */
-      background-image: url('image_4.png'); 
-      background-size: cover;
-      background-position: center 0%; /* 처음엔 이미지 위쪽 */
+      position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+      background-image: url('image_4.png'); /* 배경 이미지 URL */
+      background-size: cover; background-position: center 0%;
       z-index: -2;
-      /* 대기 화면에서는 강하게 블러 처리하고 살짝 어둡게 */
       filter: blur(12px) brightness(0.6); 
-      transform: scale(1.05); /* 블러 가장자리 보호용 확대 */
+      transform: scale(1.05);
       transition: filter 2s ease, background-position 0.1s linear; 
     }
+    #bg-layer.main-active { filter: blur(0px) brightness(1); }
 
-    /* 메인 화면 진입 시 블러가 풀리고 선명해짐 */
-    #bg-layer.main-active {
-      filter: blur(0px) brightness(1); 
-    }
-
-    /* =========================================
-       0.5. 명암/색상 필터 레이어 (구역별 조명)
-       ========================================= */
     #overlay-layer {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100vh;
-      background: rgba(0, 0, 0, 0.4); /* 기본 필터 */
-      z-index: -1;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+      background: rgba(0, 0, 0, 0.4); z-index: -1;
       transition: background 1.5s ease;
     }
 
-    /* 전체 화면 잔잔한 글리치 (터미널 느낌) */
+    /* 화면 전체의 흔들림(Glitch) 효과 삭제, 대신 아주 옅은 스캔라인 텍스처만 남김 */
     .terminal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-      background: rgba(0, 255, 204, 0.02);
-      pointer-events: none; z-index: 99998;
-      animation: overall-glitch 10s infinite;
-    }
-    @keyframes overall-glitch {
-      0%, 90%, 100% { transform: translate(0); filter: none; }
-      91% { transform: translate(-3px, 2px); filter: hue-rotate(20deg); }
-      92% { transform: translate(3px, -2px); }
-      93% { transform: translate(-1px, 1px); }
+      background: linear-gradient(rgba(0, 255, 204, 0.03) 50%, rgba(0, 0, 0, 0.05) 50%);
+      background-size: 100% 4px; pointer-events: none; z-index: 99998;
     }
 
     /* =========================================
@@ -70,36 +47,26 @@
        ========================================= */
     #intro-screen {
       position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      z-index: 99999;
-      background: transparent; /* 배경은 bg-layer가 보여줌 */
-      transition: opacity 1s;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      z-index: 99999; background: transparent; transition: opacity 1s;
     }
     .login-box {
-      border: 1px solid #333; padding: 30px;
-      background: rgba(0, 0, 0, 0.75); /* 반투명 블랙박스 */
-      box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
-      width: 320px;
-      backdrop-filter: blur(5px);
+      border: 1px solid #333; padding: 30px; background: rgba(0, 0, 0, 0.75);
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.2); width: 320px; backdrop-filter: blur(5px);
     }
     .input-group { margin-top: 20px; }
     input[type="text"] {
-      width: 100%; box-sizing: border-box;
-      background: rgba(0, 255, 204, 0.05);
-      border: 1px solid #00ffcc; color: #00ffcc;
-      padding: 10px; font-family: inherit; outline: none;
+      width: 100%; box-sizing: border-box; background: rgba(0, 255, 204, 0.05);
+      border: 1px solid #00ffcc; color: #00ffcc; padding: 10px; outline: none;
+      font-family: inherit;
     }
     button {
-      width: 100%; margin-top: 10px;
-      background: #00ffcc; color: #000;
-      border: none; padding: 10px;
-      font-family: inherit; font-weight: bold;
+      width: 100%; margin-top: 10px; background: #00ffcc; color: #000;
+      border: none; padding: 10px; font-family: inherit; font-weight: bold;
       cursor: pointer; transition: 0.2s;
     }
     button:hover { background: #ff3366; color: #fff; box-shadow: 0 0 10px #ff3366; }
 
-    /* 접속 시 대기 화면 UI 글리치 애니메이션 */
     .glitch-active { animation: intro-glitch-anim 4.5s ease-out both; }
     @keyframes intro-glitch-anim {
       0% { filter: none; transform: translate(0); }
@@ -122,71 +89,107 @@
     #fixed-status {
       position: fixed; top: 20px; right: 20px;
       background-color: rgba(7, 7, 9, 0.85); backdrop-filter: blur(10px);
-      width: 250px; z-index: 9999; display: none;
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+      width: 250px; z-index: 9999; display: none; box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
     }
-    .info-header {
-      border-bottom: 1px dashed #00ffcc;
-      padding-bottom: 8px; margin-bottom: 10px; font-weight: bold;
-    }
+    .info-header { border-bottom: 1px dashed currentcolor; padding-bottom: 8px; margin-bottom: 10px; font-weight: bold; }
     .status-item { margin: 8px 0; display: flex; justify-content: space-between; font-size: 0.9em; }
     .warning { color: #ff3366; text-shadow: 0 0 5px #ff3366; animation: blink 1.5s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
     /* =========================================
-       3. 메인 콘텐츠 
+       3. 메인 콘텐츠 (드론 맵 레이아웃)
        ========================================= */
-    #main-content { display: none; max-width: 800px; margin: 100px auto; padding: 20px; position: relative; z-index: 10;}
-    .section {
-      margin-bottom: 150px; padding: 50px;
-      border-left: 3px solid; background: rgba(0, 0, 0, 0.6); /* 글씨가 잘 보이게 박스 배경 어둡게 */
-      backdrop-filter: blur(3px);
-      min-height: 400px;
+    #main-content {
+      display: none; max-width: 900px; margin: 150px auto 100px auto; padding: 20px;
+      position: relative; z-index: 10;
     }
-    .text-guide { color: #ccc; font-style: italic; }
     
-    .welcome { border-color: #00ffcc; }
-    .veilcore { border-color: #ffffff; color: #dddddd; }
-    .midring { border-color: #888888; color: #aaaaaa; }
-    .undercity { border-color: #ff3366; color: #ff88aa; }
+    /* 가운데를 가로지르는 가이드라인 */
+    #main-content::before {
+      content: ''; position: absolute;
+      top: 0; bottom: 0; left: 50%; width: 2px;
+      background: rgba(0, 255, 204, 0.2); transform: translateX(-50%);
+      z-index: -1;
+    }
 
-    /* =========================================
-       4. 인물 기록망 
-       ========================================= */
-    .people { border-color: #00ffcc; color: #00ffcc; min-height: auto; }
-    .person-card {
-      border: 1px solid #333; padding: 15px; margin-bottom: 15px;
-      background: rgba(0,0,0,0.7); cursor: pointer; transition: 0.3s;
+    .drone-node {
+      display: flex; flex-direction: column;
+      width: 100%; margin: 80px 0; position: relative;
     }
+    .drone-node.left { align-items: flex-start; }
+    .drone-node.right { align-items: flex-end; }
+
+    /* 드론 아이콘 (클릭 버튼) */
+    .drone-icon {
+      width: 60px; height: 60px; border: 2px solid; border-radius: 50%;
+      background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center;
+      cursor: pointer; transition: 0.3s; position: relative; z-index: 2;
+      box-shadow: 0 0 15px rgba(0,0,0,0.8);
+    }
+    .drone-icon:hover { transform: scale(1.1); }
+    .drone-icon svg { width: 35px; height: 35px; }
+    
+    /* 드론 옆 라벨 (선택 사항) */
+    .drone-label {
+      position: absolute; top: 20px; font-weight: bold; letter-spacing: 1px;
+      background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px;
+    }
+    .drone-node.left .drone-label { left: 80px; }
+    .drone-node.right .drone-label { right: 80px; }
+
+    /* 클릭 시 열리는 정보 창 */
+    .node-content {
+      display: none; /* 기본적으로 숨김 */
+      width: 70%; /* 화면 너비의 70% 차지 */
+      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+      padding: 30px; margin-top: 20px; border-left: 3px solid;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+      animation: fadeIn 0.4s ease forwards;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    /* 활성화(클릭)되었을 때 창 보이기 */
+    .drone-node.active .node-content { display: block; }
+    /* 활성화되었을 때 드론 아이콘 배경색 변경 */
+    .drone-node.active .drone-icon { background: rgba(255,255,255,0.1); }
+
+    /* 각 노드별 고유 색상 적용 */
+    #node-intro { color: #00ffcc; }
+    #node-intro .drone-icon, #node-intro .node-content { border-color: #00ffcc; color: #00ffcc; }
+    
+    #node-veilcore { color: #ffffff; }
+    #node-veilcore .drone-icon, #node-veilcore .node-content { border-color: #ffffff; color: #dddddd; }
+    
+    #node-midring { color: #cccccc; }
+    #node-midring .drone-icon, #node-midring .node-content { border-color: #cccccc; color: #aaaaaa; }
+    
+    #node-undercity { color: #ff3366; }
+    #node-undercity .drone-icon, #node-undercity .node-content { border-color: #ff3366; color: #ff88aa; }
+    
+    #node-people { color: #00ffcc; }
+    #node-people .drone-icon, #node-people .node-content { border-color: #00ffcc; color: #00ffcc; }
+
+    /* 인물망 디자인 유지 */
+    .person-card { border: 1px solid #333; padding: 15px; margin-bottom: 15px; background: rgba(0,0,0,0.7); cursor: pointer; transition: 0.3s; }
     .person-card:hover { border-color: #ff3366; box-shadow: 0 0 15px rgba(255, 51, 102, 0.3); }
-    .secret-info {
-      display: none; margin-top: 15px; padding: 10px;
-      background: repeating-linear-gradient(0deg, rgba(255,51,102,0.1), rgba(255,51,102,0.1) 2px, transparent 2px, transparent 4px);
-      color: #ff3366; border-left: 3px solid #ff3366;
-    }
+    .secret-info { display: none; margin-top: 15px; padding: 10px; background: repeating-linear-gradient(0deg, rgba(255,51,102,0.1), rgba(255,51,102,0.1) 2px, transparent 2px, transparent 4px); color: #ff3366; border-left: 3px solid #ff3366; }
     .person-card:hover .secret-info { display: block; animation: static-noise 0.2s infinite; }
-    @keyframes static-noise {
-      0% { transform: translateX(1px); opacity: 0.9; }
-      50% { transform: translateX(-1px); opacity: 1; }
-      100% { transform: translateX(1px); opacity: 0.8; }
-    }
+    @keyframes static-noise { 0% { transform: translateX(1px); } 50% { transform: translateX(-1px); } 100% { transform: translateX(1px); } }
   </style>
 </head>
 <body>
 
-  <!-- 배경 이미지 레이어 -->
+  <!-- 배경 이미지 & 조명 레이어 -->
   <div id="bg-layer"></div>
-  <!-- 구역별 색상 필터 레이어 -->
   <div id="overlay-layer"></div>
-  <!-- 화면 전체 미세 노이즈 -->
+  <!-- 옅은 스캔라인 (흔들림 없음) -->
   <div class="terminal-overlay"></div>
 
-  <!-- [1] 대기 화면 (Intro Screen) -->
+  <!-- [1] 대기 화면 -->
   <div id="intro-screen">
     <div class="login-box" id="login-box">
       <div class="status-panel">
-        <!-- 터미널 이름 변경됨! -->
-        <div class="info-header"># WARREN TERMINAL ACCESS #</div>
+        <div class="info-header" style="border-color: #00ffcc; color: #00ffcc;"># WARREN TERMINAL ACCESS #</div>
         <div class="status-item"><span>📍 위치</span> <span>알 수 없음</span></div>
         <div class="status-item warning"><span>🔒 시그눔</span> <span>[미인증]</span></div>
         <div class="status-item"><span>신원 확인</span> <span>대기 중...</span></div>
@@ -199,8 +202,7 @@
   </div>
 
   <!-- [2] 우측 상단 고정 상태창 -->
-  <div id="fixed-status" class="status-panel">
-    <!-- 터미널 이름 변경됨! -->
+  <div id="fixed-status" class="status-panel" style="border-color: #00ffcc; color: #00ffcc;">
     <div class="info-header"># WARREN TERMINAL ACCESS #</div>
     <div class="status-item"><span>📍 위치</span> <span id="current-location">미드링</span></div>
     <div class="status-item"><span>💰 노타</span> <span>10 NTA</span></div>
@@ -208,64 +210,105 @@
     <div class="status-item"><span>🤝 관계</span> <span>경계</span></div>
   </div>
 
-  <!-- [3] 메인 콘텐츠 구역 -->
+  <!-- [3] 메인 콘텐츠 (지그재그 드론 맵) -->
   <div id="main-content">
     
-    <div class="section welcome">
-      <h2 style="color: #00ffcc;">>> SYSTEM LOG_IN : <span id="display-name">이방인</span></h2>
-      <p class="text-guide">
-        환영한다. 원래는 하늘이었을 자리를 낡은 케이블 뭉치와 젖은 빨래들이 대신 가리고 있고, 별빛 대신 상가 간판 불빛이 시궁창 웅덩이 위로 어지럽게 어른거리는 이곳, 미드링 회색지대에 온 것을.
-      </p>
-      <p class="text-guide">
-        코를 찌르는 건 튀김 기름과 녹슨 파이프 냄새가 사이좋게 뒤섞인 이 구역 특제 방향제고, 저 멀리서 들려오는 '위이잉—' 소리는 너를 반기는 축포가 아니라 손목을 스캔 중인 순찰 드론의 경고음이다. 표식이 없다고? 슬슬 숨 고르는 게 좋을 텐데.
-      </p>
-    </div>
-
-    <!-- 베일코어 -->
-    <div class="section veilcore" id="sec-veilcore">
-      <h2 style="color: #ffffff;">[ LAYER 1 : 베일코어 Veilcore ]</h2>
-      <p><strong>접속 조건:</strong> 1급 시그눔 인증 및 막대한 자본력 증명</p>
-      <p class="text-guide">
-        "어딜 감히 올려다봐? 그 더러운 부츠로 밟을 수 있는 바닥이 아니니 꿈도 꾸지 마라. 여긴 네가 평생 만져보지도 못할 노타가 1초 단위로 굴러다니는 곳이니까."
-      </p>
-    </div>
-
-    <!-- 미드링 -->
-    <div class="section midring" id="sec-midring">
-      <h2 style="color: #cccccc;">[ LAYER 2 : 미드링 Mid-ring 회색지대 ]</h2>
-      <p><strong>접속 조건:</strong> 임시 시그눔 또는 구역 통행권 소지</p>
-      <p class="text-guide">
-        "네가 지금 헐떡이며 숨 쉬고 있는 시궁창. 부탁을 하고 싶다고? 대가부터 테이블 위에 올려둬. 아, 네 잔고의 10 노타로는 껌 한 통 사기도 빠듯하겠지만."
-      </p>
-    </div>
-
-    <!-- 언더시티 -->
-    <div class="section undercity" id="sec-undercity">
-      <h2 style="color: #ff3366;">[ LAYER 3 : 언더시티 Undercity 크롬지대 ]</h2>
-      <p><strong>접속 조건:</strong> 생존 본능, 묻지 않을 침묵</p>
-      <p class="text-guide">
-        "발밑 조심해. 여기선 네 목숨값이 네 뱃속에 든 인공 장기보다 싸게 먹히니까. 시그눔 따위는 안 통하는 진짜 무법지대지."
-      </p>
-    </div>
-
-    <!-- 인물 기록망 -->
-    <div class="section people">
-      <h2 style="color: #00ffcc;">[ DATABASE : 인물 기록망 ]</h2>
-      <div class="person-card">
-        <h3>정보상 '비트' (Bit)</h3>
-        <p><strong>거래 성향:</strong> 선금 50% 요구. 감정적인 호소는 통하지 않음.</p>
-        <p><strong>특이사항:</strong> 항상 싸구려 박하 껌을 씹고 있음.</p>
-        <div class="secret-info">
-          <span>[ System: 암호화 해제 중... ]</span><br>
-          >> 놓지 못하는 것 : 미드링에 버려진 동생을 찾기 위한 종이 사진 한 장.
-        </div>
+    <!-- 1. 세계관 안내 (왼쪽) -->
+    <div class="drone-node left active" id="node-intro">
+      <div class="drone-label">DRN-01 : WORLD</div>
+      <div class="drone-icon" onclick="toggleNode('node-intro')">
+        <!-- 사이버펑크 드론 SVG 아이콘 -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="4"/> <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/> <rect x="3" y="3" width="3" height="3"/> <rect x="18" y="3" width="3" height="3"/> <rect x="3" y="18" width="3" height="3"/> <rect x="18" y="18" width="3" height="3"/>
+        </svg>
       </div>
-      <div class="person-card">
-        <h3>무기 밀매상 '잭 도우'</h3>
-        <p><strong>거래 성향:</strong> 노타 대신 희귀한 부품을 더 선호함. 흥정 시 위협적인 태도.</p>
-        <div class="secret-info">
-          <span>[ System: 암호화 해제 중... ]</span><br>
-          >> 놓지 못하는 것 : 과거 베일코어에서 추방당할 때 빼앗긴 자신의 진짜 이름.
+      <div class="node-content">
+        <h2>>> SYSTEM LOG_IN : <span id="display-name">이방인</span></h2>
+        <p style="color: #ccc; font-style: italic;">
+          환영한다. 원래는 하늘이었을 자리를 낡은 케이블 뭉치와 젖은 빨래들이 대신 가리고 있고, 별빛 대신 상가 간판 불빛이 시궁창 웅덩이 위로 어지럽게 어른거리는 이곳, 미드링 회색지대에 온 것을.
+        </p>
+        <p style="color: #ccc; font-style: italic;">
+          코를 찌르는 건 튀김 기름과 녹슨 파이프 냄새가 사이좋게 뒤섞인 이 구역 특제 방향제고, 저 멀리서 들려오는 '위이잉—' 소리는 너를 반기는 축포가 아니라 손목을 스캔 중인 순찰 드론의 경고음이다. 표식이 없다고? 슬슬 숨 고르는 게 좋을 텐데.
+        </p>
+      </div>
+    </div>
+
+    <!-- 2. 베일코어 (오른쪽) -->
+    <div class="drone-node right" id="node-veilcore">
+      <div class="drone-label">DRN-02 : VEILCORE</div>
+      <div class="drone-icon" onclick="toggleNode('node-veilcore')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="4"/> <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/> <rect x="3" y="3" width="3" height="3"/> <rect x="18" y="3" width="3" height="3"/> <rect x="3" y="18" width="3" height="3"/> <rect x="18" y="18" width="3" height="3"/>
+        </svg>
+      </div>
+      <div class="node-content">
+        <h2>[ LAYER 1 : 베일코어 Veilcore ]</h2>
+        <p><strong>접속 조건:</strong> 1급 시그눔 인증 및 막대한 자본력 증명</p>
+        <p style="color: #ccc; font-style: italic;">
+          "어딜 감히 올려다봐? 그 더러운 부츠로 밟을 수 있는 바닥이 아니니 꿈도 꾸지 마라. 여긴 네가 평생 만져보지도 못할 노타가 1초 단위로 굴러다니는 곳이니까."
+        </p>
+      </div>
+    </div>
+
+    <!-- 3. 미드링 (왼쪽) -->
+    <div class="drone-node left" id="node-midring">
+      <div class="drone-label">DRN-03 : MID-RING</div>
+      <div class="drone-icon" onclick="toggleNode('node-midring')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="4"/> <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/> <rect x="3" y="3" width="3" height="3"/> <rect x="18" y="3" width="3" height="3"/> <rect x="3" y="18" width="3" height="3"/> <rect x="18" y="18" width="3" height="3"/>
+        </svg>
+      </div>
+      <div class="node-content">
+        <h2>[ LAYER 2 : 미드링 Mid-ring 회색지대 ]</h2>
+        <p><strong>접속 조건:</strong> 임시 시그눔 또는 구역 통행권 소지</p>
+        <p style="color: #ccc; font-style: italic;">
+          "네가 지금 헐떡이며 숨 쉬고 있는 시궁창. 부탁을 하고 싶다고? 대가부터 테이블 위에 올려둬. 아, 네 잔고의 10 노타로는 껌 한 통 사기도 빠듯하겠지만."
+        </p>
+      </div>
+    </div>
+
+    <!-- 4. 언더시티 (오른쪽) -->
+    <div class="drone-node right" id="node-undercity">
+      <div class="drone-label">DRN-04 : UNDERCITY</div>
+      <div class="drone-icon" onclick="toggleNode('node-undercity')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="4"/> <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/> <rect x="3" y="3" width="3" height="3"/> <rect x="18" y="3" width="3" height="3"/> <rect x="3" y="18" width="3" height="3"/> <rect x="18" y="18" width="3" height="3"/>
+        </svg>
+      </div>
+      <div class="node-content">
+        <h2>[ LAYER 3 : 언더시티 Undercity 크롬지대 ]</h2>
+        <p><strong>접속 조건:</strong> 생존 본능, 묻지 않을 침묵</p>
+        <p style="color: #ccc; font-style: italic;">
+          "발밑 조심해. 여기선 네 목숨값이 네 뱃속에 든 인공 장기보다 싸게 먹히니까. 시그눔 따위는 안 통하는 진짜 무법지대지."
+        </p>
+      </div>
+    </div>
+
+    <!-- 5. 인물 기록망 (왼쪽) -->
+    <div class="drone-node left" id="node-people">
+      <div class="drone-label">DRN-05 : DATABASE</div>
+      <div class="drone-icon" onclick="toggleNode('node-people')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="4"/> <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/> <rect x="3" y="3" width="3" height="3"/> <rect x="18" y="3" width="3" height="3"/> <rect x="3" y="18" width="3" height="3"/> <rect x="18" y="18" width="3" height="3"/>
+        </svg>
+      </div>
+      <div class="node-content">
+        <h2>[ DATABASE : 인물 기록망 ]</h2>
+        <div class="person-card">
+          <h3>정보상 '비트' (Bit)</h3>
+          <p><strong>거래 성향:</strong> 선금 50% 요구. 감정적인 호소는 통하지 않음.</p>
+          <div class="secret-info">
+            <span>[ System: 암호화 해제 중... ]</span><br>
+            >> 놓지 못하는 것 : 미드링에 버려진 동생을 찾기 위한 종이 사진 한 장.
+          </div>
+        </div>
+        <div class="person-card">
+          <h3>무기 밀매상 '잭 도우'</h3>
+          <p><strong>거래 성향:</strong> 노타 대신 희귀한 부품을 더 선호함. 흥정 시 위협적인 태도.</p>
+          <div class="secret-info">
+            <span>[ System: 암호화 해제 중... ]</span><br>
+            >> 놓지 못하는 것 : 과거 베일코어에서 추방당할 때 빼앗긴 자신의 진짜 이름.
+          </div>
         </div>
       </div>
     </div>
@@ -273,7 +316,18 @@
   </div>
 
   <script>
-    // 1. 화면 전환 함수
+    // 1. 드론 아이콘 클릭 시 정보창 열고 닫기 함수
+    function toggleNode(nodeId) {
+      const node = document.getElementById(nodeId);
+      // 이미 열려있으면 닫고, 닫혀있으면 열기
+      if (node.classList.contains('active')) {
+        node.classList.remove('active');
+      } else {
+        node.classList.add('active');
+      }
+    }
+
+    // 2. 접속 시 화면 전환
     function enterCity() {
       const nameInput = document.getElementById('visitor-name').value;
       document.getElementById('display-name').innerText = nameInput.trim() !== '' ? nameInput : '이방인';
@@ -289,44 +343,40 @@
         introScreen.style.display = 'none';
         mainContent.style.display = 'block';
         fixedStatus.style.display = 'block';
-        // 접속 성공 시 배경 이미지의 블러 효과 제거!
         bgLayer.classList.add('main-active'); 
       }, 4500); 
     }
 
-    // 2. 스크롤 연동 (배경 이동 & 명암 필터링)
+    // 3. 스크롤 연동 (배경 이동 & 명암 필터링)
     window.addEventListener('scroll', () => {
       const scrollY = window.scrollY;
       const scrollPos = scrollY + (window.innerHeight / 2);
       
-      const veilcore = document.getElementById('sec-veilcore').offsetTop;
-      const midring = document.getElementById('sec-midring').offsetTop;
-      const undercity = document.getElementById('sec-undercity').offsetTop;
+      const veilcore = document.getElementById('node-veilcore').offsetTop;
+      const midring = document.getElementById('node-midring').offsetTop;
+      const undercity = document.getElementById('node-undercity').offsetTop;
 
       const locText = document.getElementById('current-location');
       const overlayLayer = document.getElementById('overlay-layer');
       const bgLayer = document.getElementById('bg-layer');
 
-      // 패럴랙스 스크롤: 화면을 내릴수록 배경 이미지가 위로 스르륵 올라가면서 아래쪽 뷰가 보임
-      // 문서 전체 높이 계산
       const maxScroll = document.body.scrollHeight - window.innerHeight;
       if (maxScroll > 0) {
         const scrollPercent = (scrollY / maxScroll) * 100;
         bgLayer.style.backgroundPosition = `center ${scrollPercent}%`;
       }
 
-      // 구역별 조명(오버레이) 및 위치 텍스트 업데이트
       if (scrollPos < veilcore) {
-        overlayLayer.style.background = 'rgba(0, 0, 0, 0.4)'; // 기본 어두움
+        overlayLayer.style.background = 'rgba(0, 0, 0, 0.4)';
         locText.innerText = "더 워런 (진입로)";
       } else if (scrollPos >= veilcore && scrollPos < midring) {
-        overlayLayer.style.background = 'rgba(200, 200, 255, 0.15)'; // 베일코어: 살짝 밝은 푸른빛/은빛 조명
+        overlayLayer.style.background = 'rgba(200, 200, 255, 0.15)'; 
         locText.innerText = "베일코어 근접";
       } else if (scrollPos >= midring && scrollPos < undercity) {
-        overlayLayer.style.background = 'rgba(10, 10, 10, 0.6)'; // 미드링: 탁하고 어두움
+        overlayLayer.style.background = 'rgba(10, 10, 10, 0.6)'; 
         locText.innerText = "미드링 회색지대";
       } else if (scrollPos >= undercity) {
-        overlayLayer.style.background = 'rgba(50, 0, 10, 0.8)'; // 언더시티: 핏빛이 도는 깊은 어둠
+        overlayLayer.style.background = 'rgba(50, 0, 10, 0.8)'; 
         locText.innerText = "언더시티 크롬지대";
       }
     });
