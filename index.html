@@ -5,127 +5,179 @@
   <meta name="viewport" content="width=device-width, initial-width=1.0">
   <title>THE WARREN - 불법 접속 터미널</title>
   <style>
-    /* 전체 배경 및 폰트 설정 (사이버펑크 터미널 감성) */
+    /* 기본 설정 */
     body {
-      background-color: #070709;
+      background-color: #000000; /* 초기 접속 화면은 완전한 블랙 */
       color: #00ffcc;
       font-family: 'Courier New', Courier, monospace;
       margin: 0;
       padding: 0;
       line-height: 1.6;
       overflow-x: hidden;
+      transition: background-color 1s ease; /* 배경색이 부드럽게 변하도록 설정 */
     }
 
-    /* 텍스트 드래그(선택) 색상 */
-    ::selection {
-      background: #ff3366;
-      color: #fff;
-    }
+    ::selection { background: #ff3366; color: #fff; }
 
-    /* 우측 상단 고정 상태창 (INFO 패널) */
-    #status-panel {
+    /* =========================================
+       1. 대기 화면 (Intro Screen)
+       ========================================= */
+    #intro-screen {
       position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: rgba(7, 7, 9, 0.85);
+      top: 0; left: 0; width: 100%; height: 100vh;
+      background-color: #070709;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      transition: opacity 0.5s;
+    }
+    .login-box {
+      border: 1px solid #333;
+      padding: 30px;
+      background: rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+      width: 300px;
+    }
+    .input-group { margin-top: 20px; }
+    input[type="text"] {
+      width: 100%; box-sizing: border-box;
+      background: transparent;
+      border: 1px solid #00ffcc;
+      color: #00ffcc;
+      padding: 10px;
+      font-family: inherit;
+      outline: none;
+    }
+    button {
+      width: 100%; margin-top: 10px;
+      background: #00ffcc; color: #000;
+      border: none; padding: 10px;
+      font-family: inherit; font-weight: bold;
+      cursor: pointer; transition: 0.2s;
+    }
+    button:hover { background: #ff3366; color: #fff; }
+
+    /* 글리치(지지직) 애니메이션 */
+    .glitch-active {
+      animation: glitch-anim 0.8s cubic-bezier(.25, .46, .45, .94) both;
+    }
+    @keyframes glitch-anim {
+      0% { filter: invert(0); transform: translate(0); }
+      20% { filter: invert(1); transform: translate(-10px, 5px); }
+      40% { filter: invert(0); transform: translate(10px, -5px); }
+      60% { filter: hue-rotate(90deg); transform: translate(-5px, -10px) skewX(20deg); }
+      80% { filter: invert(1); transform: translate(5px, 10px); }
+      100% { filter: invert(0); transform: translate(0) scale(1.5); opacity: 0; }
+    }
+
+    /* =========================================
+       2. 상태창 (INFO 패널)
+       ========================================= */
+    .status-panel {
       border: 1px solid #333;
       padding: 15px;
-      width: 250px;
+      margin-bottom: 20px;
+    }
+    #fixed-status {
+      position: fixed; top: 20px; right: 20px;
+      background-color: rgba(7, 7, 9, 0.9);
+      width: 250px; z-index: 9999;
+      display: none; /* 메인 화면 진입 시 보여짐 */
       box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
-      backdrop-filter: blur(5px);
-      z-index: 9999;
     }
     .info-header {
       border-bottom: 1px dashed #00ffcc;
-      padding-bottom: 8px;
-      margin-bottom: 10px;
-      font-weight: bold;
-      font-size: 0.9em;
-      letter-spacing: 1px;
+      padding-bottom: 8px; margin-bottom: 10px; font-weight: bold;
     }
-    .status-item {
-      font-size: 0.85em;
-      margin: 8px 0;
-      display: flex;
-      justify-content: space-between;
-    }
-    /* 경고 네온 깜빡임 효과 */
-    .warning {
-      color: #ff3366;
-      text-shadow: 0 0 5px #ff3366;
-      animation: blink 1.5s infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
+    .status-item { margin: 8px 0; display: flex; justify-content: space-between; font-size: 0.9em; }
+    .warning { color: #ff3366; text-shadow: 0 0 5px #ff3366; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-    /* 메인 컨테이너 */
-    .container {
-      max-width: 800px;
-      margin: 100px auto;
-      padding: 20px;
+    /* =========================================
+       3. 메인 콘텐츠 및 구역별 스타일
+       ========================================= */
+    #main-content {
+      display: none; /* 대기 화면이 끝나면 나타남 */
+      max-width: 800px; margin: 100px auto; padding: 20px;
     }
-
-    /* 구역별 스타일 */
     .section {
-      margin-bottom: 100px;
-      padding: 30px;
-      border-left: 3px solid;
-      background: rgba(255, 255, 255, 0.02);
+      margin-bottom: 120px; padding: 40px;
+      border-left: 3px solid; background: rgba(255, 255, 255, 0.02);
+      min-height: 400px;
     }
-    .section h2 {
-      font-size: 1.5em;
-      margin-top: 0;
-      letter-spacing: 2px;
-    }
-    .text-guide {
-      color: #aaa;
-      font-style: italic;
-    }
+    .text-guide { color: #aaa; font-style: italic; }
+    
+    .veilcore { border-color: #ffffff; color: #dddddd; }
+    .midring { border-color: #888888; color: #aaaaaa; }
+    .undercity { border-color: #ff3366; color: #ff88aa; }
 
-    /* 환영사 (스캔 효과) */
-    .welcome {
-      border-color: #00ffcc;
+    /* =========================================
+       4. 인물 기록망 (Hover 노이즈 효과)
+       ========================================= */
+    .people { border-color: #00ffcc; color: #00ffcc; min-height: auto; }
+    .person-card {
+      border: 1px solid #333; padding: 15px; margin-bottom: 15px;
+      background: rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s;
     }
-    
-    /* 베일코어 (상층부 - 차갑고 하얀 빛) */
-    .veilcore {
-      border-color: #ffffff;
-      color: #dddddd;
-    }
-    
-    /* 미드링 (중간층 - 탁한 회색빛) */
-    .midring {
-      border-color: #888888;
-      color: #aaaaaa;
-    }
-    
-    /* 언더시티 (최하층 - 위험한 붉은빛) */
-    .undercity {
+    .person-card:hover {
       border-color: #ff3366;
-      color: #ff88aa;
+      box-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
+    }
+    .secret-info {
+      display: none; margin-top: 15px; padding: 10px;
+      background: repeating-linear-gradient(
+        0deg, rgba(255,51,102,0.1), rgba(255,51,102,0.1) 2px, transparent 2px, transparent 4px
+      );
+      color: #ff3366; border-left: 3px solid #ff3366;
+    }
+    .person-card:hover .secret-info {
+      display: block;
+      animation: static-noise 0.2s infinite;
+    }
+    @keyframes static-noise {
+      0% { transform: translateX(1px); opacity: 0.9; }
+      50% { transform: translateX(-1px); opacity: 1; }
+      100% { transform: translateX(1px); opacity: 0.8; }
     }
   </style>
 </head>
 <body>
 
-  <!-- 상태창 (항상 떠 있음) -->
-  <div id="status-panel">
+  <!-- [1] 대기 화면 (Intro Screen) -->
+  <div id="intro-screen">
+    <div class="login-box" id="login-box">
+      <!-- INFO 패널 폼 -->
+      <div class="status-panel">
+        <div class="info-header"># INFO : TERMINAL ACCESS #</div>
+        <div class="status-item"><span>📍 위치</span> <span>알 수 없음</span></div>
+        <div class="status-item warning"><span>🔒 시그눔</span> <span>[미인증]</span></div>
+        <div class="status-item"><span>신원 확인</span> <span>대기 중...</span></div>
+      </div>
+      <div class="input-group">
+        <input type="text" id="visitor-name" placeholder="이름(식별자)을 입력하라..." autocomplete="off">
+        <button onclick="enterCity()">[ 강제 접속 시도 ]</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- [2] 우측 상단 고정 상태창 (메인 진입 후 활성화) -->
+  <div id="fixed-status" class="status-panel">
     <div class="info-header"># INFO : UNAUTHORIZED #</div>
-    <div class="status-item"><span>📍 위치</span> <span>미드링</span></div>
+    <div class="status-item"><span>📍 위치</span> <span id="current-location">미드링</span></div>
     <div class="status-item"><span>💰 노타</span> <span>10 NTA</span></div>
     <div class="status-item warning"><span>🔒 시그눔</span> <span>[미인증]</span></div>
     <div class="status-item"><span>🤝 관계</span> <span>경계</span></div>
   </div>
 
-  <div class="container">
+  <!-- [3] 메인 콘텐츠 구역 -->
+  <div id="main-content">
     
-    <!-- 진입 환영사 -->
-    <div class="section welcome">
-      <h2 style="color: #00ffcc;">>> SYSTEM LOG_IN</h2>
+    <div class="section welcome" style="border-color: #00ffcc;">
+      <h2 style="color: #00ffcc;">>> SYSTEM LOG_IN : <span id="display-name">이방인</span></h2>
       <p class="text-guide">
-        환영한다. 원래는 하늘이었을 자리를 낡은 케이블 뭉치와 젖은 빨래들이 대신 가리고 있고, 별빛 대신 상가 간판 불빛이 시궁창 웅덩이 위로 어지럽게 어른거리는 이곳, '더 워런'에 온 것을.
+        환영한다. 원래는 하늘이었을 자리를 낡은 케이블 뭉치와 젖은 빨래들이 대신 가리고 있고, 별빛 대신 상가 간판 불빛이 시궁창 웅덩이 위로 어지럽게 어른거리는 이곳, 미드링 회색지대에 온 것을.
       </p>
       <p class="text-guide">
         코를 찌르는 건 튀김 기름과 녹슨 파이프 냄새가 사이좋게 뒤섞인 이 구역 특제 방향제고, 저 멀리서 들려오는 '위이잉—' 소리는 너를 반기는 축포가 아니라 손목을 스캔 중인 순찰 드론의 경고음이다. 표식이 없다고? 슬슬 숨 고르는 게 좋을 텐데.
@@ -133,42 +185,108 @@
     </div>
 
     <!-- 베일코어 -->
-    <div class="section veilcore">
+    <div class="section veilcore" id="sec-veilcore">
       <h2 style="color: #ffffff;">[ LAYER 1 : 베일코어 Veilcore ]</h2>
-      <p>
-        <strong>접속 조건:</strong> 1급 시그눔 인증 및 막대한 자본력 증명<br>
-        <strong>상태:</strong> 접근 불가 (Access Denied)
-      </p>
+      <p><strong>접속 조건:</strong> 1급 시그눔 인증 및 막대한 자본력 증명</p>
       <p class="text-guide">
-        "어딜 감히 올려다봐? 그 더러운 부츠로 밟을 수 있는 바닥이 아니니 꿈도 꾸지 마라. 여긴 네가 평생 만져보지도 못할 노타가 1초 단위로 굴러다니는 곳이니까. 위조 시그눔 따위로 기웃거렸다간 드론이 네 뇌를 바싹 구워버릴 거다."
+        "어딜 감히 올려다봐? 그 더러운 부츠로 밟을 수 있는 바닥이 아니니 꿈도 꾸지 마라. 여긴 네가 평생 만져보지도 못할 노타가 1초 단위로 굴러다니는 곳이니까."
       </p>
     </div>
 
     <!-- 미드링 -->
-    <div class="section midring">
+    <div class="section midring" id="sec-midring">
       <h2 style="color: #cccccc;">[ LAYER 2 : 미드링 Mid-ring 회색지대 ]</h2>
-      <p>
-        <strong>접속 조건:</strong> 임시 시그눔 또는 구역 통행권 소지<br>
-        <strong>상태:</strong> 현재 위치 (불안정)
-      </p>
+      <p><strong>접속 조건:</strong> 임시 시그눔 또는 구역 통행권 소지</p>
       <p class="text-guide">
-        "네가 지금 헐떡이며 숨 쉬고 있는 시궁창. 여기 사람들은 친절한 미소 뒤에 항상 청구서를 숨기고 있지. 부탁을 하고 싶다고? 대가부터 테이블 위에 올려둬. 아, 물론 네 잔고에 남은 10 노타로는 껌 한 통 사기도 빠듯하겠지만."
+        "네가 지금 헐떡이며 숨 쉬고 있는 시궁창. 부탁을 하고 싶다고? 대가부터 테이블 위에 올려둬. 아, 네 잔고의 10 노타로는 껌 한 통 사기도 빠듯하겠지만."
       </p>
     </div>
 
     <!-- 언더시티 -->
-    <div class="section undercity">
+    <div class="section undercity" id="sec-undercity">
       <h2 style="color: #ff3366;">[ LAYER 3 : 언더시티 Undercity 크롬지대 ]</h2>
-      <p>
-        <strong>접속 조건:</strong> 생존 본능, 묻지 않을 침묵<br>
-        <strong>상태:</strong> 스캔 범위를 벗어남 (위험도 최고)
-      </p>
+      <p><strong>접속 조건:</strong> 생존 본능, 묻지 않을 침묵</p>
       <p class="text-guide">
-        "발밑 조심해. 여기선 네 목숨값이 네 뱃속에 든 인공 장기보다 싸게 먹히니까. 시그눔 따위는 안 통하는 진짜 무법지대지. 차라리 순찰 드론의 스캔이 그리워질지도 몰라."
+        "발밑 조심해. 여기선 네 목숨값이 네 뱃속에 든 인공 장기보다 싸게 먹히니까. 시그눔 따위는 안 통하는 진짜 무법지대지."
       </p>
+    </div>
+
+    <!-- 인물 기록망 -->
+    <div class="section people">
+      <h2 style="color: #00ffcc;">[ DATABASE : 인물 기록망 ]</h2>
+      
+      <!-- 캐릭터 1 -->
+      <div class="person-card">
+        <h3>정보상 '비트' (Bit)</h3>
+        <p><strong>거래 성향:</strong> 선금 50% 요구. 감정적인 호소는 통하지 않음.</p>
+        <p><strong>특이사항:</strong> 항상 싸구려 박하 껌을 씹고 있음.</p>
+        <div class="secret-info">
+          <span>[ System: 암호화 해제 중... ]</span><br>
+          >> 놓지 못하는 것 : 미드링에 버려진 동생을 찾기 위한 종이 사진 한 장.
+        </div>
+      </div>
+
+      <!-- 캐릭터 2 -->
+      <div class="person-card">
+        <h3>무기 밀매상 '잭 도우'</h3>
+        <p><strong>거래 성향:</strong> 노타 대신 희귀한 부품을 더 선호함. 흥정 시 위협적인 태도.</p>
+        <div class="secret-info">
+          <span>[ System: 암호화 해제 중... ]</span><br>
+          >> 놓지 못하는 것 : 과거 베일코어에서 추방당할 때 빼앗긴 자신의 진짜 이름.
+        </div>
+      </div>
     </div>
 
   </div>
 
+  <script>
+    // 1. 대기 화면에서 메인 화면으로 넘어가는 글리치 함수
+    function enterCity() {
+      const nameInput = document.getElementById('visitor-name').value;
+      const visitorName = nameInput.trim() !== '' ? nameInput : '이방인';
+      
+      // 이름 세팅
+      document.getElementById('display-name').innerText = visitorName;
+
+      const introScreen = document.getElementById('intro-screen');
+      const mainContent = document.getElementById('main-content');
+      const fixedStatus = document.getElementById('fixed-status');
+
+      // 글리치 효과 시작
+      introScreen.classList.add('glitch-active');
+
+      // 애니메이션이 끝난 후 화면 전환
+      setTimeout(() => {
+        introScreen.style.display = 'none';
+        mainContent.style.display = 'block';
+        fixedStatus.style.display = 'block';
+      }, 800); // 0.8초 후 전환
+    }
+
+    // 2. 스크롤 위치에 따라 배경색과 상태창 위치 텍스트 변경
+    window.addEventListener('scroll', () => {
+      const scrollPos = window.scrollY + (window.innerHeight / 2); // 화면 중간 기준
+      
+      const veilcore = document.getElementById('sec-veilcore').offsetTop;
+      const midring = document.getElementById('sec-midring').offsetTop;
+      const undercity = document.getElementById('sec-undercity').offsetTop;
+
+      const locText = document.getElementById('current-location');
+
+      if (scrollPos < veilcore) {
+        document.body.style.backgroundColor = '#070709'; // 상단: 어두운 네이비톤
+        locText.innerText = "더 워런 (진입로)";
+      } else if (scrollPos >= veilcore && scrollPos < midring) {
+        document.body.style.backgroundColor = '#1a1a24'; // 베일코어: 약간 차가운 빛
+        locText.innerText = "베일코어 근접";
+      } else if (scrollPos >= midring && scrollPos < undercity) {
+        document.body.style.backgroundColor = '#0a0a0c'; // 미드링: 탁하고 어두운 회색
+        locText.innerText = "미드링 회색지대";
+      } else if (scrollPos >= undercity) {
+        document.body.style.backgroundColor = '#050000'; // 언더시티: 숨 막히는 검은색(핏빛 섞임)
+        locText.innerText = "언더시티 크롬지대";
+      }
+    });
+  </script>
 </body>
 </html>
