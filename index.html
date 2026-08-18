@@ -7,76 +7,88 @@
   <style>
     /* 기본 설정 */
     body {
-      background-color: #000000;
+      background-color: #000;
       color: #00ffcc;
       font-family: 'Courier New', Courier, monospace;
       margin: 0;
       padding: 0;
       line-height: 1.6;
       overflow-x: hidden;
-      transition: background 1s ease;
-      /* 전체 글리치 효과 애니메이션 */
-      animation: overall-glitch 10s infinite;
     }
 
     ::selection { background: #ff3366; color: #fff; }
 
     /* =========================================
-       전체 글리치 효과 (Overall Glitch)
+       0. 배경 이미지 레이어 (고정 & 패럴랙스 스크롤)
        ========================================= */
+    #bg-layer {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100vh;
+      /* 👇 여기에 조무래기가 깃허브에 올린 배경 이미지 파일명을 적어라냥! */
+      background-image: url('image_4.png'); 
+      background-size: cover;
+      background-position: center 0%; /* 처음엔 이미지 위쪽 */
+      z-index: -2;
+      /* 대기 화면에서는 강하게 블러 처리하고 살짝 어둡게 */
+      filter: blur(12px) brightness(0.6); 
+      transform: scale(1.05); /* 블러 가장자리 보호용 확대 */
+      transition: filter 2s ease, background-position 0.1s linear; 
+    }
+
+    /* 메인 화면 진입 시 블러가 풀리고 선명해짐 */
+    #bg-layer.main-active {
+      filter: blur(0px) brightness(1); 
+    }
+
+    /* =========================================
+       0.5. 명암/색상 필터 레이어 (구역별 조명)
+       ========================================= */
+    #overlay-layer {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100vh;
+      background: rgba(0, 0, 0, 0.4); /* 기본 필터 */
+      z-index: -1;
+      transition: background 1.5s ease;
+    }
+
+    /* 전체 화면 잔잔한 글리치 (터미널 느낌) */
+    .terminal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+      background: rgba(0, 255, 204, 0.02);
+      pointer-events: none; z-index: 99998;
+      animation: overall-glitch 10s infinite;
+    }
     @keyframes overall-glitch {
       0%, 90%, 100% { transform: translate(0); filter: none; }
-      91% { transform: translate(-5px, 3px) skewX(5deg); filter: hue-rotate(20deg) invert(0.1); }
-      92% { transform: translate(5px, -3px) skewX(-5deg); filter: hue-rotate(-20deg) invert(0.1); }
-      93% { transform: translate(-3px, 1px) skewY(3deg); filter: hue-rotate(10deg); }
-      94% { transform: translate(3px, -1px) skewY(-3deg); filter: hue-rotate(-10deg); }
-      95% { transform: translate(0); filter: none; }
+      91% { transform: translate(-3px, 2px); filter: hue-rotate(20deg); }
+      92% { transform: translate(3px, -2px); }
+      93% { transform: translate(-1px, 1px); }
     }
 
     /* =========================================
        1. 대기 화면 (Intro Screen)
        ========================================= */
     #intro-screen {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100vh;
-      /* 사용자가 제공한 썸네일 이미지를 배경으로 설정하고 블러 처리 */
-      background-image: url('image_4.png'); /* 주의: 실제 이미지 URL로 변경해야 함 */
-      background-size: cover;
-      background-position: center;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
       z-index: 99999;
-      transition: opacity 1s, filter 1s; /* 전환 효과 부드럽게 */
+      background: transparent; /* 배경은 bg-layer가 보여줌 */
+      transition: opacity 1s;
     }
-
-    /* 블러 레이어 */
-    .blur-layer {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(7, 7, 9, 0.7); /* 어두운 레이어 추가 */
-      filter: blur(10px); /* 블러 처리 */
-      z-index: -1;
-    }
-
     .login-box {
-      border: 1px solid #333;
-      padding: 30px;
-      background: rgba(0, 0, 0, 0.85); /* 약간 더 어둡게 */
+      border: 1px solid #333; padding: 30px;
+      background: rgba(0, 0, 0, 0.75); /* 반투명 블랙박스 */
       box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
-      width: 300px;
-      position: relative;
+      width: 320px;
+      backdrop-filter: blur(5px);
     }
     .input-group { margin-top: 20px; }
     input[type="text"] {
       width: 100%; box-sizing: border-box;
-      background: transparent;
-      border: 1px solid #00ffcc;
-      color: #00ffcc;
-      padding: 10px;
-      font-family: inherit;
-      outline: none;
+      background: rgba(0, 255, 204, 0.05);
+      border: 1px solid #00ffcc; color: #00ffcc;
+      padding: 10px; font-family: inherit; outline: none;
     }
     button {
       width: 100%; margin-top: 10px;
@@ -85,12 +97,10 @@
       font-family: inherit; font-weight: bold;
       cursor: pointer; transition: 0.2s;
     }
-    button:hover { background: #ff3366; color: #fff; }
+    button:hover { background: #ff3366; color: #fff; box-shadow: 0 0 10px #ff3366; }
 
-    /* 대기 화면 글리치 애니메이션 (4초 이상 지속) */
-    .glitch-active {
-      animation: intro-glitch-anim 4.5s ease-out both; /* 4.5초 동안 진행 */
-    }
+    /* 접속 시 대기 화면 UI 글리치 애니메이션 */
+    .glitch-active { animation: intro-glitch-anim 4.5s ease-out both; }
     @keyframes intro-glitch-anim {
       0% { filter: none; transform: translate(0); }
       10% { filter: invert(0.8); transform: translate(-10px, 5px); }
@@ -108,16 +118,11 @@
     /* =========================================
        2. 상태창 (INFO 패널)
        ========================================= */
-    .status-panel {
-      border: 1px solid #333;
-      padding: 15px;
-      margin-bottom: 20px;
-    }
+    .status-panel { border: 1px solid #333; padding: 15px; margin-bottom: 20px; }
     #fixed-status {
       position: fixed; top: 20px; right: 20px;
-      background-color: rgba(7, 7, 9, 0.9);
-      width: 250px; z-index: 9999;
-      display: none;
+      background-color: rgba(7, 7, 9, 0.85); backdrop-filter: blur(10px);
+      width: 250px; z-index: 9999; display: none;
       box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
     }
     .info-header {
@@ -129,68 +134,37 @@
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
     /* =========================================
-       3. 메인 콘텐츠 및 구역별 배경 (CSS 그라데이션)
+       3. 메인 콘텐츠 
        ========================================= */
-    #main-content {
-      display: none;
-      max-width: 800px; margin: 100px auto; padding: 20px;
-    }
+    #main-content { display: none; max-width: 800px; margin: 100px auto; padding: 20px; position: relative; z-index: 10;}
     .section {
       margin-bottom: 150px; padding: 50px;
-      border-left: 3px solid; background: rgba(255, 255, 255, 0.02);
-      min-height: 500px;
-      /* 구역별 배경 설정을 위한 기본 배경색 추가 (스크롤 시 시각적 분리) */
-      background-attachment: fixed;
+      border-left: 3px solid; background: rgba(0, 0, 0, 0.6); /* 글씨가 잘 보이게 박스 배경 어둡게 */
+      backdrop-filter: blur(3px);
+      min-height: 400px;
     }
-    .text-guide { color: #aaa; font-style: italic; }
+    .text-guide { color: #ccc; font-style: italic; }
     
-    /* 베일코어: 은색/흰색 테마 배경 (데이터 스트림 느낌) */
-    .veilcore {
-      border-color: #ffffff; color: #dddddd;
-      background: linear-gradient(135deg, rgba(200, 200, 200, 0.1), rgba(255, 255, 255, 0.05)), 
-                  url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M 0 0 L 10 10 M 0 10 L 10 0" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" /></svg>'); /* 미세한 격자 패턴 */
-      background-attachment: fixed;
-    }
-    
-    /* 미드링: 탁한 회색 테마 배경 (낡은 파이프/전선 느낌) */
-    .midring {
-      border-color: #888888; color: #aaaaaa;
-      background: linear-gradient(135deg, rgba(30, 30, 30, 0.8), rgba(10, 10, 10, 0.9)), 
-                  url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><circle cx="10" cy="10" r="1.5" fill="rgba(100,100,100,0.2)" /></svg>'); /* 낡은 도트 패턴 */
-      background-attachment: fixed;
-    }
-    
-    /* 언더시티: 위험한 핏빛 붉은색 테마 배경 (크롬/거친 질감 느낌) */
-    .undercity {
-      border-color: #ff3366; color: #ff88aa;
-      background: linear-gradient(135deg, rgba(30, 0, 0, 0.9), rgba(10, 0, 0, 1)), 
-                  url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><path d="M 0 0 L 30 30 M 0 30 L 30 0" stroke="rgba(255, 51, 102, 0.15)" stroke-width="1.5" /></svg>'); /* 거친 크로스 패턴 */
-      background-attachment: fixed;
-    }
+    .welcome { border-color: #00ffcc; }
+    .veilcore { border-color: #ffffff; color: #dddddd; }
+    .midring { border-color: #888888; color: #aaaaaa; }
+    .undercity { border-color: #ff3366; color: #ff88aa; }
 
     /* =========================================
-       4. 인물 기록망 (Hover 노이즈 효과)
+       4. 인물 기록망 
        ========================================= */
     .people { border-color: #00ffcc; color: #00ffcc; min-height: auto; }
     .person-card {
       border: 1px solid #333; padding: 15px; margin-bottom: 15px;
-      background: rgba(0,0,0,0.5); cursor: pointer; transition: 0.3s;
+      background: rgba(0,0,0,0.7); cursor: pointer; transition: 0.3s;
     }
-    .person-card:hover {
-      border-color: #ff3366;
-      box-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
-    }
+    .person-card:hover { border-color: #ff3366; box-shadow: 0 0 15px rgba(255, 51, 102, 0.3); }
     .secret-info {
       display: none; margin-top: 15px; padding: 10px;
-      background: repeating-linear-gradient(
-        0deg, rgba(255,51,102,0.1), rgba(255,51,102,0.1) 2px, transparent 2px, transparent 4px
-      );
+      background: repeating-linear-gradient(0deg, rgba(255,51,102,0.1), rgba(255,51,102,0.1) 2px, transparent 2px, transparent 4px);
       color: #ff3366; border-left: 3px solid #ff3366;
     }
-    .person-card:hover .secret-info {
-      display: block;
-      animation: static-noise 0.2s infinite;
-    }
+    .person-card:hover .secret-info { display: block; animation: static-noise 0.2s infinite; }
     @keyframes static-noise {
       0% { transform: translateX(1px); opacity: 0.9; }
       50% { transform: translateX(-1px); opacity: 1; }
@@ -200,13 +174,19 @@
 </head>
 <body>
 
+  <!-- 배경 이미지 레이어 -->
+  <div id="bg-layer"></div>
+  <!-- 구역별 색상 필터 레이어 -->
+  <div id="overlay-layer"></div>
+  <!-- 화면 전체 미세 노이즈 -->
+  <div class="terminal-overlay"></div>
+
   <!-- [1] 대기 화면 (Intro Screen) -->
   <div id="intro-screen">
-    <div class="blur-layer"></div> <!-- 블러 레이어 추가 -->
     <div class="login-box" id="login-box">
-      <!-- INFO 패널 폼 -->
       <div class="status-panel">
-        <div class="info-header"># INFO : TERMINAL ACCESS #</div>
+        <!-- 터미널 이름 변경됨! -->
+        <div class="info-header"># WARREN TERMINAL ACCESS #</div>
         <div class="status-item"><span>📍 위치</span> <span>알 수 없음</span></div>
         <div class="status-item warning"><span>🔒 시그눔</span> <span>[미인증]</span></div>
         <div class="status-item"><span>신원 확인</span> <span>대기 중...</span></div>
@@ -218,9 +198,10 @@
     </div>
   </div>
 
-  <!-- [2] 우측 상단 고정 상태창 (메인 진입 후 활성화) -->
+  <!-- [2] 우측 상단 고정 상태창 -->
   <div id="fixed-status" class="status-panel">
-    <div class="info-header"># INFO : UNAUTHORIZED #</div>
+    <!-- 터미널 이름 변경됨! -->
+    <div class="info-header"># WARREN TERMINAL ACCESS #</div>
     <div class="status-item"><span>📍 위치</span> <span id="current-location">미드링</span></div>
     <div class="status-item"><span>💰 노타</span> <span>10 NTA</span></div>
     <div class="status-item warning"><span>🔒 시그눔</span> <span>[미인증]</span></div>
@@ -230,7 +211,7 @@
   <!-- [3] 메인 콘텐츠 구역 -->
   <div id="main-content">
     
-    <div class="section welcome" style="border-color: #00ffcc;">
+    <div class="section welcome">
       <h2 style="color: #00ffcc;">>> SYSTEM LOG_IN : <span id="display-name">이방인</span></h2>
       <p class="text-guide">
         환영한다. 원래는 하늘이었을 자리를 낡은 케이블 뭉치와 젖은 빨래들이 대신 가리고 있고, 별빛 대신 상가 간판 불빛이 시궁창 웅덩이 위로 어지럽게 어른거리는 이곳, 미드링 회색지대에 온 것을.
@@ -270,8 +251,6 @@
     <!-- 인물 기록망 -->
     <div class="section people">
       <h2 style="color: #00ffcc;">[ DATABASE : 인물 기록망 ]</h2>
-      
-      <!-- 캐릭터 1 -->
       <div class="person-card">
         <h3>정보상 '비트' (Bit)</h3>
         <p><strong>거래 성향:</strong> 선금 50% 요구. 감정적인 호소는 통하지 않음.</p>
@@ -281,8 +260,6 @@
           >> 놓지 못하는 것 : 미드링에 버려진 동생을 찾기 위한 종이 사진 한 장.
         </div>
       </div>
-
-      <!-- 캐릭터 2 -->
       <div class="person-card">
         <h3>무기 밀매상 '잭 도우'</h3>
         <p><strong>거래 성향:</strong> 노타 대신 희귀한 부품을 더 선호함. 흥정 시 위협적인 태도.</p>
@@ -296,54 +273,60 @@
   </div>
 
   <script>
-    // 1. 대기 화면에서 메인 화면으로 넘어가는 글리치 함수 (전환 시간 증가)
+    // 1. 화면 전환 함수
     function enterCity() {
       const nameInput = document.getElementById('visitor-name').value;
-      const visitorName = nameInput.trim() !== '' ? nameInput : '이방인';
-      
-      // 이름 세팅
-      document.getElementById('display-name').innerText = visitorName;
+      document.getElementById('display-name').innerText = nameInput.trim() !== '' ? nameInput : '이방인';
 
       const introScreen = document.getElementById('intro-screen');
       const mainContent = document.getElementById('main-content');
       const fixedStatus = document.getElementById('fixed-status');
+      const bgLayer = document.getElementById('bg-layer');
 
-      // 글리치 효과 시작 (CSS 애니메이션)
       introScreen.classList.add('glitch-active');
 
-      // 애니메이션이 끝난 후 화면 전환 (setTimeout 시간을 4000ms 이상으로 설정)
       setTimeout(() => {
         introScreen.style.display = 'none';
         mainContent.style.display = 'block';
         fixedStatus.style.display = 'block';
-      }, 4500); // 4.5초 후 전환
+        // 접속 성공 시 배경 이미지의 블러 효과 제거!
+        bgLayer.classList.add('main-active'); 
+      }, 4500); 
     }
 
-    // 2. 스크롤 위치에 따라 구역별 배경 설정 변경 (그라데이션 및 패턴 적용)
+    // 2. 스크롤 연동 (배경 이동 & 명암 필터링)
     window.addEventListener('scroll', () => {
-      const scrollPos = window.scrollY + (window.innerHeight / 2); // 화면 중간 기준
+      const scrollY = window.scrollY;
+      const scrollPos = scrollY + (window.innerHeight / 2);
       
       const veilcore = document.getElementById('sec-veilcore').offsetTop;
       const midring = document.getElementById('sec-midring').offsetTop;
       const undercity = document.getElementById('sec-undercity').offsetTop;
 
       const locText = document.getElementById('current-location');
+      const overlayLayer = document.getElementById('overlay-layer');
+      const bgLayer = document.getElementById('bg-layer');
 
+      // 패럴랙스 스크롤: 화면을 내릴수록 배경 이미지가 위로 스르륵 올라가면서 아래쪽 뷰가 보임
+      // 문서 전체 높이 계산
+      const maxScroll = document.body.scrollHeight - window.innerHeight;
+      if (maxScroll > 0) {
+        const scrollPercent = (scrollY / maxScroll) * 100;
+        bgLayer.style.backgroundPosition = `center ${scrollPercent}%`;
+      }
+
+      // 구역별 조명(오버레이) 및 위치 텍스트 업데이트
       if (scrollPos < veilcore) {
-        // 진입로: 어두운 배경 유지 (전체 글리치 효과 강조)
-        document.body.style.background = '#070709';
+        overlayLayer.style.background = 'rgba(0, 0, 0, 0.4)'; // 기본 어두움
         locText.innerText = "더 워런 (진입로)";
       } else if (scrollPos >= veilcore && scrollPos < midring) {
-        // 베일코어 구역: 은색/흰색 테마 배경 (CSS 그라데이션 및 패턴)
-        document.body.style.background = 'linear-gradient(135deg, rgba(200, 200, 200, 0.1), rgba(255, 255, 255, 0.05)), url(\'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><path d="M 0 0 L 10 10 M 0 10 L 10 0" stroke="rgba(255,255,255,0.1)" stroke-width="0.5" /></svg>\')';
+        overlayLayer.style.background = 'rgba(200, 200, 255, 0.15)'; // 베일코어: 살짝 밝은 푸른빛/은빛 조명
         locText.innerText = "베일코어 근접";
       } else if (scrollPos >= midring && scrollPos < undercity) {
-        // 미드링 구역: 탁한 회색 테마 배경
-        document.body.style.background = 'linear-gradient(135deg, rgba(30, 30, 30, 0.8), rgba(10, 10, 10, 0.9)), url(\'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"><circle cx="10" cy="10" r="1.5" fill="rgba(100,100,100,0.2)" /></svg>\')';
+        overlayLayer.style.background = 'rgba(10, 10, 10, 0.6)'; // 미드링: 탁하고 어두움
         locText.innerText = "미드링 회색지대";
       } else if (scrollPos >= undercity) {
-        // 언더시티 구역: 위험한 핏빛 붉은색 테마 배경
-        document.body.style.background = 'linear-gradient(135deg, rgba(30, 0, 0, 0.9), rgba(10, 0, 0, 1)), url(\'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"><path d="M 0 0 L 30 30 M 0 30 L 30 0" stroke="rgba(255, 51, 102, 0.15)" stroke-width="1.5" /></svg>\')';
+        overlayLayer.style.background = 'rgba(50, 0, 10, 0.8)'; // 언더시티: 핏빛이 도는 깊은 어둠
         locText.innerText = "언더시티 크롬지대";
       }
     });
