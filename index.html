@@ -42,6 +42,26 @@
     }
 
     /* =========================================
+       [NEW] 상단 네비게이션 메뉴 바
+       ========================================= */
+    #top-nav {
+      position: fixed; top: 0; left: 0; width: 100%;
+      background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px);
+      border-bottom: 1px solid #00ffcc;
+      display: none; /* 처음 대기 화면에서는 숨김 */
+      justify-content: space-between; align-items: center;
+      padding: 15px 40px; box-sizing: border-box; z-index: 10000;
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.2);
+    }
+    .nav-logo { font-weight: bold; color: #00ffcc; font-size: 1.2em; letter-spacing: 2px; }
+    .nav-links a {
+      color: #ccc; text-decoration: none; margin-left: 25px;
+      font-size: 0.95em; cursor: pointer; transition: 0.3s;
+      font-weight: bold;
+    }
+    .nav-links a:hover { color: #ff3366; text-shadow: 0 0 5px #ff3366; }
+
+    /* =========================================
        1. 대기 화면 (Intro Screen)
        ========================================= */
     #intro-screen {
@@ -86,7 +106,8 @@
        ========================================= */
     .status-panel { border: 1px solid #333; padding: 15px; margin-bottom: 20px; }
     #fixed-status {
-      position: fixed; top: 20px; right: 20px;
+      position: fixed; top: 80px; /* 네비바에 가려지지 않게 20px에서 80px로 수정! */ 
+      right: 20px;
       background-color: rgba(7, 7, 9, 0.85); backdrop-filter: blur(10px);
       width: 250px; z-index: 9999; display: none; box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
     }
@@ -201,7 +222,7 @@
       font-size: 0.8em;
       letter-spacing: 1px;
     }
-    /* 실제 이미지가 적용될 때 사용하는 클래스 (현재는 안 쓰임) */
+    /* 실제 이미지가 적용될 때 사용하는 클래스 */
     .char-img img { width: 100%; height: 100%; object-fit: cover; }
 
     .char-name {
@@ -225,6 +246,18 @@
   </style>
 </head>
 <body>
+
+  <!-- [NEW] 상단 네비게이션 메뉴 바 -->
+  <nav id="top-nav">
+    <div class="nav-logo">THE WARREN</div>
+    <div class="nav-links">
+      <a onclick="goToNode('node-intro')">세계관</a>
+      <a onclick="goToNode('node-veilcore')">베일코어</a>
+      <a onclick="goToNode('node-midring')">미드링</a>
+      <a onclick="goToNode('node-undercity')">언더시티</a>
+      <a onclick="goToNode('node-people')">데이터베이스</a>
+    </div>
+  </nav>
 
   <!-- 배경 이미지 & 조명 레이어 -->
   <div id="bg-layer"></div>
@@ -292,6 +325,7 @@
           </li>
         </ul>
       </div>
+    </div>
 
     <!-- 2. 베일코어 (오른쪽) -->
     <div class="drone-node right" id="node-veilcore">
@@ -428,6 +462,7 @@
   </div>
 
   <script>
+    // 드론 아이콘 클릭 시 정보창 열고 닫기
     function toggleNode(nodeId) {
       const node = document.getElementById(nodeId);
       if (node.classList.contains('active')) {
@@ -435,6 +470,15 @@
       } else {
         node.classList.add('active');
       }
+    }
+
+    // [NEW] 상단 네비게이션 클릭 시 해당 섹션으로 부드럽게 이동하고 창 열기
+    function goToNode(nodeId) {
+      const node = document.getElementById(nodeId);
+      if (!node.classList.contains('active')) {
+        node.classList.add('active');
+      }
+      node.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     function enterCity() {
@@ -445,6 +489,7 @@
       const mainContent = document.getElementById('main-content');
       const fixedStatus = document.getElementById('fixed-status');
       const bgLayer = document.getElementById('bg-layer');
+      const topNav = document.getElementById('top-nav'); // 네비게이션 바 추가
 
       introScreen.classList.add('glitch-active');
 
@@ -452,6 +497,7 @@
         introScreen.style.display = 'none';
         mainContent.style.display = 'block';
         fixedStatus.style.display = 'block';
+        topNav.style.display = 'flex'; // 메인 접속 시 네비게이션 바 나타남
         bgLayer.classList.add('main-active'); 
       }, 4500); 
     }
