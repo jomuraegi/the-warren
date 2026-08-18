@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-width=1.0">
+  <title>THE WARREN - 불법 접속 터미널</title>
+  <style>
+    /* 전체 배경 및 폰트 설정 (사이버펑크 터미널 감성) */
+    body {
+      background-color: #070709;
+      color: #00ffcc;
+      font-family: 'Courier New', Courier, monospace;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* 텍스트 드래그(선택) 색상 */
+    ::selection {
+      background: #ff3366;
+      color: #fff;
+    }
+
+    /* 우측 상단 고정 상태창 (INFO 패널) */
+    #status-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: rgba(7, 7, 9, 0.85);
+      border: 1px solid #333;
+      padding: 15px;
+      width: 250px;
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.1);
+      backdrop-filter: blur(5px);
+      z-index: 9999;
+    }
+    .info-header {
+      border-bottom: 1px dashed #00ffcc;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-size: 0.9em;
+      letter-spacing: 1px;
+    }
+    .status-item {
+      font-size: 0.85em;
+      margin: 8px 0;
+      display: flex;
+      justify-content: space-between;
+    }
+    /* 경고 네온 깜빡임 효과 */
+    .warning {
+      color: #ff3366;
+      text-shadow: 0 0 5px #ff3366;
+      animation: blink 1.5s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* 메인 컨테이너 */
+    .container {
+      max-width: 800px;
+      margin: 100px auto;
+      padding: 20px;
+    }
+
+    /* 구역별 스타일 */
+    .section {
+      margin-bottom: 100px;
+      padding: 30px;
+      border-left: 3px solid;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .section h2 {
+      font-size: 1.5em;
+      margin-top: 0;
+      letter-spacing: 2px;
+    }
+    .text-guide {
+      color: #aaa;
+      font-style: italic;
+    }
+
+    /* 환영사 (스캔 효과) */
+    .welcome {
+      border-color: #00ffcc;
+    }
+    
+    /* 베일코어 (상층부 - 차갑고 하얀 빛) */
+    .veilcore {
+      border-color: #ffffff;
+      color: #dddddd;
+    }
+    
+    /* 미드링 (중간층 - 탁한 회색빛) */
+    .midring {
+      border-color: #888888;
+      color: #aaaaaa;
+    }
+    
+    /* 언더시티 (최하층 - 위험한 붉은빛) */
+    .undercity {
+      border-color: #ff3366;
+      color: #ff88aa;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 상태창 (항상 떠 있음) -->
+  <div id="status-panel">
+    <div class="info-header"># INFO : UNAUTHORIZED #</div>
+    <div class="status-item"><span>📍 위치</span> <span>미드링</span></div>
+    <div class="status-item"><span>💰 노타</span> <span>10 NTA</span></div>
+    <div class="status-item warning"><span>🔒 시그눔</span> <span>[미인증]</span></div>
+    <div class="status-item"><span>🤝 관계</span> <span>경계</span></div>
+  </div>
+
+  <div class="container">
+    
+    <!-- 진입 환영사 -->
+    <div class="section welcome">
+      <h2 style="color: #00ffcc;">>> SYSTEM LOG_IN</h2>
+      <p class="text-guide">
+        환영한다. 원래는 하늘이었을 자리를 낡은 케이블 뭉치와 젖은 빨래들이 대신 가리고 있고, 별빛 대신 상가 간판 불빛이 시궁창 웅덩이 위로 어지럽게 어른거리는 이곳, '더 워런'에 온 것을.
+      </p>
+      <p class="text-guide">
+        코를 찌르는 건 튀김 기름과 녹슨 파이프 냄새가 사이좋게 뒤섞인 이 구역 특제 방향제고, 저 멀리서 들려오는 '위이잉—' 소리는 너를 반기는 축포가 아니라 손목을 스캔 중인 순찰 드론의 경고음이다. 표식이 없다고? 슬슬 숨 고르는 게 좋을 텐데.
+      </p>
+    </div>
+
+    <!-- 베일코어 -->
+    <div class="section veilcore">
+      <h2 style="color: #ffffff;">[ LAYER 1 : 베일코어 Veilcore ]</h2>
+      <p>
+        <strong>접속 조건:</strong> 1급 시그눔 인증 및 막대한 자본력 증명<br>
+        <strong>상태:</strong> 접근 불가 (Access Denied)
+      </p>
+      <p class="text-guide">
+        "어딜 감히 올려다봐? 그 더러운 부츠로 밟을 수 있는 바닥이 아니니 꿈도 꾸지 마라. 여긴 네가 평생 만져보지도 못할 노타가 1초 단위로 굴러다니는 곳이니까. 위조 시그눔 따위로 기웃거렸다간 드론이 네 뇌를 바싹 구워버릴 거다."
+      </p>
+    </div>
+
+    <!-- 미드링 -->
+    <div class="section midring">
+      <h2 style="color: #cccccc;">[ LAYER 2 : 미드링 Mid-ring 회색지대 ]</h2>
+      <p>
+        <strong>접속 조건:</strong> 임시 시그눔 또는 구역 통행권 소지<br>
+        <strong>상태:</strong> 현재 위치 (불안정)
+      </p>
+      <p class="text-guide">
+        "네가 지금 헐떡이며 숨 쉬고 있는 시궁창. 여기 사람들은 친절한 미소 뒤에 항상 청구서를 숨기고 있지. 부탁을 하고 싶다고? 대가부터 테이블 위에 올려둬. 아, 물론 네 잔고에 남은 10 노타로는 껌 한 통 사기도 빠듯하겠지만."
+      </p>
+    </div>
+
+    <!-- 언더시티 -->
+    <div class="section undercity">
+      <h2 style="color: #ff3366;">[ LAYER 3 : 언더시티 Undercity 크롬지대 ]</h2>
+      <p>
+        <strong>접속 조건:</strong> 생존 본능, 묻지 않을 침묵<br>
+        <strong>상태:</strong> 스캔 범위를 벗어남 (위험도 최고)
+      </p>
+      <p class="text-guide">
+        "발밑 조심해. 여기선 네 목숨값이 네 뱃속에 든 인공 장기보다 싸게 먹히니까. 시그눔 따위는 안 통하는 진짜 무법지대지. 차라리 순찰 드론의 스캔이 그리워질지도 몰라."
+      </p>
+    </div>
+
+  </div>
+
+</body>
+</html>
