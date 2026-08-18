@@ -35,7 +35,6 @@
       transition: background 1.5s ease;
     }
 
-    /* 화면 전체의 흔들림(Glitch) 효과 삭제, 대신 아주 옅은 스캔라인 텍스처만 남김 */
     .terminal-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
       background: linear-gradient(rgba(0, 255, 204, 0.03) 50%, rgba(0, 0, 0, 0.05) 50%);
@@ -104,7 +103,6 @@
       position: relative; z-index: 10;
     }
     
-    /* 가운데를 가로지르는 가이드라인 */
     #main-content::before {
       content: ''; position: absolute;
       top: 0; bottom: 0; left: 50%; width: 2px;
@@ -119,7 +117,6 @@
     .drone-node.left { align-items: flex-start; }
     .drone-node.right { align-items: flex-end; }
 
-    /* 드론 아이콘 (클릭 버튼) */
     .drone-icon {
       width: 60px; height: 60px; border: 2px solid; border-radius: 50%;
       background: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center;
@@ -129,7 +126,6 @@
     .drone-icon:hover { transform: scale(1.1); }
     .drone-icon svg { width: 35px; height: 35px; }
     
-    /* 드론 옆 라벨 (선택 사항) */
     .drone-label {
       position: absolute; top: 20px; font-weight: bold; letter-spacing: 1px;
       background: rgba(0,0,0,0.6); padding: 2px 8px; border-radius: 4px;
@@ -137,23 +133,19 @@
     .drone-node.left .drone-label { left: 80px; }
     .drone-node.right .drone-label { right: 80px; }
 
-    /* 클릭 시 열리는 정보 창 */
     .node-content {
-      display: none; /* 기본적으로 숨김 */
-      width: 70%; /* 화면 너비의 70% 차지 */
-      background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
+      display: none; width: 70%;
+      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(5px);
       padding: 30px; margin-top: 20px; border-left: 3px solid;
       box-shadow: 0 5px 20px rgba(0,0,0,0.5);
       animation: fadeIn 0.4s ease forwards;
     }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     
-    /* 활성화(클릭)되었을 때 창 보이기 */
     .drone-node.active .node-content { display: block; }
-    /* 활성화되었을 때 드론 아이콘 배경색 변경 */
     .drone-node.active .drone-icon { background: rgba(255,255,255,0.1); }
 
-    /* 각 노드별 고유 색상 적용 */
+    /* 노드 고유 색상 */
     #node-intro { color: #00ffcc; }
     #node-intro .drone-icon, #node-intro .node-content { border-color: #00ffcc; color: #00ffcc; }
     
@@ -168,13 +160,68 @@
     
     #node-people { color: #00ffcc; }
     #node-people .drone-icon, #node-people .node-content { border-color: #00ffcc; color: #00ffcc; }
+    /* 인물 기록망 넓게 사용 */
+    #node-people .node-content { width: 90%; } 
 
-    /* 인물망 디자인 유지 */
-    .person-card { border: 1px solid #333; padding: 15px; margin-bottom: 15px; background: rgba(0,0,0,0.7); cursor: pointer; transition: 0.3s; }
-    .person-card:hover { border-color: #ff3366; box-shadow: 0 0 15px rgba(255, 51, 102, 0.3); }
-    .secret-info { display: none; margin-top: 15px; padding: 10px; background: repeating-linear-gradient(0deg, rgba(255,51,102,0.1), rgba(255,51,102,0.1) 2px, transparent 2px, transparent 4px); color: #ff3366; border-left: 3px solid #ff3366; }
-    .person-card:hover .secret-info { display: block; animation: static-noise 0.2s infinite; }
-    @keyframes static-noise { 0% { transform: translateX(1px); } 50% { transform: translateX(-1px); } 100% { transform: translateX(1px); } }
+    /* =========================================
+       4. 인물 기록망 캐릭터 카드 (Grid)
+       ========================================= */
+    .character-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .char-card {
+      border: 1px solid #333;
+      background: rgba(0,0,0,0.6);
+      padding: 10px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    .char-card:hover {
+      background: rgba(0, 255, 204, 0.1);
+      border-color: #00ffcc;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,255,204,0.2);
+    }
+    
+    /* 이미지 들어갈 자리 */
+    .char-img {
+      width: 100%;
+      height: 140px;
+      background: #111;
+      border: 1px dashed #444;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #555;
+      font-size: 0.8em;
+      letter-spacing: 1px;
+    }
+    /* 실제 이미지가 적용될 때 사용하는 클래스 (현재는 안 쓰임) */
+    .char-img img { width: 100%; height: 100%; object-fit: cover; }
+
+    .char-name {
+      color: #00ffcc;
+      font-weight: bold;
+      font-size: 1.05em;
+      margin-bottom: 5px;
+    }
+    .char-role {
+      color: #ccc;
+      font-size: 0.75em;
+      line-height: 1.4;
+      word-break: keep-all;
+    }
+    
+    /* 구역별 카드 상단 컬러 띠 */
+    .veilcore-border { border-top: 3px solid #ffffff; }
+    .midring-border { border-top: 3px solid #cccccc; }
+    .undercity-border { border-top: 3px solid #ff3366; }
+
   </style>
 </head>
 <body>
@@ -182,7 +229,6 @@
   <!-- 배경 이미지 & 조명 레이어 -->
   <div id="bg-layer"></div>
   <div id="overlay-layer"></div>
-  <!-- 옅은 스캔라인 (흔들림 없음) -->
   <div class="terminal-overlay"></div>
 
   <!-- [1] 대기 화면 -->
@@ -217,7 +263,6 @@
     <div class="drone-node left active" id="node-intro">
       <div class="drone-label">DRN-01 : WORLD</div>
       <div class="drone-icon" onclick="toggleNode('node-intro')">
-        <!-- 사이버펑크 드론 SVG 아이콘 -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <circle cx="12" cy="12" r="4"/> <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/> <rect x="3" y="3" width="3" height="3"/> <rect x="18" y="3" width="3" height="3"/> <rect x="3" y="18" width="3" height="3"/> <rect x="18" y="18" width="3" height="3"/>
         </svg>
@@ -226,9 +271,6 @@
         <h2>>> SYSTEM LOG_IN : <span id="display-name">이방인</span></h2>
         <p style="color: #ccc; font-style: italic;">
           환영한다. 원래는 하늘이었을 자리를 낡은 케이블 뭉치와 젖은 빨래들이 대신 가리고 있고, 별빛 대신 상가 간판 불빛이 시궁창 웅덩이 위로 어지럽게 어른거리는 이곳, 미드링 회색지대에 온 것을.
-        </p>
-        <p style="color: #ccc; font-style: italic;">
-          코를 찌르는 건 튀김 기름과 녹슨 파이프 냄새가 사이좋게 뒤섞인 이 구역 특제 방향제고, 저 멀리서 들려오는 '위이잉—' 소리는 너를 반기는 축포가 아니라 손목을 스캔 중인 순찰 드론의 경고음이다. 표식이 없다고? 슬슬 숨 고르는 게 좋을 텐데.
         </p>
       </div>
     </div>
@@ -244,9 +286,6 @@
       <div class="node-content">
         <h2>[ LAYER 1 : 베일코어 Veilcore ]</h2>
         <p><strong>접속 조건:</strong> 1급 시그눔 인증 및 막대한 자본력 증명</p>
-        <p style="color: #ccc; font-style: italic;">
-          "어딜 감히 올려다봐? 그 더러운 부츠로 밟을 수 있는 바닥이 아니니 꿈도 꾸지 마라. 여긴 네가 평생 만져보지도 못할 노타가 1초 단위로 굴러다니는 곳이니까."
-        </p>
       </div>
     </div>
 
@@ -261,9 +300,6 @@
       <div class="node-content">
         <h2>[ LAYER 2 : 미드링 Mid-ring 회색지대 ]</h2>
         <p><strong>접속 조건:</strong> 임시 시그눔 또는 구역 통행권 소지</p>
-        <p style="color: #ccc; font-style: italic;">
-          "네가 지금 헐떡이며 숨 쉬고 있는 시궁창. 부탁을 하고 싶다고? 대가부터 테이블 위에 올려둬. 아, 네 잔고의 10 노타로는 껌 한 통 사기도 빠듯하겠지만."
-        </p>
       </div>
     </div>
 
@@ -278,9 +314,6 @@
       <div class="node-content">
         <h2>[ LAYER 3 : 언더시티 Undercity 크롬지대 ]</h2>
         <p><strong>접속 조건:</strong> 생존 본능, 묻지 않을 침묵</p>
-        <p style="color: #ccc; font-style: italic;">
-          "발밑 조심해. 여기선 네 목숨값이 네 뱃속에 든 인공 장기보다 싸게 먹히니까. 시그눔 따위는 안 통하는 진짜 무법지대지."
-        </p>
       </div>
     </div>
 
@@ -292,23 +325,84 @@
           <circle cx="12" cy="12" r="4"/> <path d="M12 2v4M12 18v4M2 12h4M18 12h4"/> <rect x="3" y="3" width="3" height="3"/> <rect x="18" y="3" width="3" height="3"/> <rect x="3" y="18" width="3" height="3"/> <rect x="18" y="18" width="3" height="3"/>
         </svg>
       </div>
+      
+      <!-- 인물 카드 그리드 영역 -->
       <div class="node-content">
-        <h2>[ DATABASE : 인물 기록망 ]</h2>
-        <div class="person-card">
-          <h3>정보상 '비트' (Bit)</h3>
-          <p><strong>거래 성향:</strong> 선금 50% 요구. 감정적인 호소는 통하지 않음.</p>
-          <div class="secret-info">
-            <span>[ System: 암호화 해제 중... ]</span><br>
-            >> 놓지 못하는 것 : 미드링에 버려진 동생을 찾기 위한 종이 사진 한 장.
+        <h2>[ DATABASE : 등록된 인물 13명 ]</h2>
+        
+        <div class="character-grid">
+          
+          <!-- 상층부 (베일코어) -->
+          <div class="char-card veilcore-border">
+            <div class="char-img"><img src="유부남.png"></div>
+            <div class="char-name">데클란</div>
+            <div class="char-role">드론 관리자 남편<br>(상층부)</div>
           </div>
-        </div>
-        <div class="person-card">
-          <h3>무기 밀매상 '잭 도우'</h3>
-          <p><strong>거래 성향:</strong> 노타 대신 희귀한 부품을 더 선호함. 흥정 시 위협적인 태도.</p>
-          <div class="secret-info">
-            <span>[ System: 암호화 해제 중... ]</span><br>
-            >> 놓지 못하는 것 : 과거 베일코어에서 추방당할 때 빼앗긴 자신의 진짜 이름.
+          <div class="char-card veilcore-border">
+            <div class="char-img"><img src="유부녀.png"></div>
+            <div class="char-name">아리스</div>
+            <div class="char-role">드론 관리자 아내<br>(상층부)</div>
           </div>
+          <div class="char-card veilcore-border">
+            <div class="char-img"><img src="인플루언서.png"></div>
+            <div class="char-name">노바</div>
+            <div class="char-role">인플루언서<br>(상층부)</div>
+          </div>
+
+          <!-- 미드링 회색지대 -->
+          <div class="char-card midring-border">
+            <div class="char-img"><img src="국수사장.png"></div>
+            <div class="char-name">메이</div>
+            <div class="char-role">국수가게 주인<br>(24시간 운영)</div>
+          </div>
+          <div class="char-card midring-border">
+            <div class="char-img"><img src="잡화점.png"></div>
+            <div class="char-name">리브</div>
+            <div class="char-role">벨벳가게 잡화점<br>(미드링)</div>
+          </div>
+          <div class="char-card midring-border">
+            <div class="char-img"><img src="통행권.png"></div>
+            <div class="char-name">에리</div>
+            <div class="char-role">통행세 발권 담당<br>(미드링)</div>
+          </div>
+          <div class="char-card midring-border">
+            <div class="char-img"><img src="밀수꾼.png"></div>
+            <div class="char-name">자야</div>
+            <div class="char-role">밀수꾼<br>(미드링)</div>
+          </div>
+
+          <!-- 언더시티 크롬지대 -->
+          <div class="char-card undercity-border">
+            <div class="char-img"><img src="핏파이터.png"></div>
+            <div class="char-name">베라</div>
+            <div class="char-role">지하 격투장 핏파이터<br>(언더시티)</div>
+          </div>
+          <div class="char-card undercity-border">
+            <div class="char-img"><img src="흥신소.png"></div>
+            <div class="char-name">세이지</div>
+            <div class="char-role">흥신소 고스트 와이어<br>(언더시티)</div>
+          </div>
+          <div class="char-card undercity-border">
+            <div class="char-img"><img src="바니걸1.png"></div>
+            <div class="char-name">루비</div>
+            <div class="char-role">최고참 바니걸<br>(바니 바)</div>
+          </div>
+          <div class="char-card undercity-border">
+            <div class="char-img"><img src="바니걸2.png"></div>
+            <div class="char-name">하로</div>
+            <div class="char-role">신입 바니걸<br>(바니 바)</div>
+          </div>
+          <div class="char-card undercity-border">
+            <div class="char-img"><img src="바니걸3.png"></div>
+            <div class="char-name">모아</div>
+            <div class="char-role">시크한 바니걸<br>(바니 바)</div>
+          </div>
+          <div class="char-card undercity-border">
+            <div class="char-img"><img src="무직여자.png"></div>
+            <div class="char-name">시라</div>
+            <div class="char-role">무직백수<br>(언더시티)</div>
+          </div>
+          
         </div>
       </div>
     </div>
@@ -316,10 +410,8 @@
   </div>
 
   <script>
-    // 1. 드론 아이콘 클릭 시 정보창 열고 닫기 함수
     function toggleNode(nodeId) {
       const node = document.getElementById(nodeId);
-      // 이미 열려있으면 닫고, 닫혀있으면 열기
       if (node.classList.contains('active')) {
         node.classList.remove('active');
       } else {
@@ -327,7 +419,6 @@
       }
     }
 
-    // 2. 접속 시 화면 전환
     function enterCity() {
       const nameInput = document.getElementById('visitor-name').value;
       document.getElementById('display-name').innerText = nameInput.trim() !== '' ? nameInput : '이방인';
@@ -347,7 +438,6 @@
       }, 4500); 
     }
 
-    // 3. 스크롤 연동 (배경 이동 & 명암 필터링)
     window.addEventListener('scroll', () => {
       const scrollY = window.scrollY;
       const scrollPos = scrollY + (window.innerHeight / 2);
